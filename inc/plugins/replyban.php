@@ -412,7 +412,7 @@ function replyban_run()
 
 		log_moderator_action(array("tid" => $thread['tid'], "fid" => $thread['fid'], "uid" => $user['uid'], "username" => $user['username']), $lang->user_reply_banned);
 
-		moderation_redirect(get_thread_link($thread['tid']), $lang->redirect_user_banned_replying);
+		moderation_redirect("moderation.php?action=replyban&tid={$thread['tid']}", $lang->redirect_user_banned_replying);
 	}
 
 	if($mybb->input['action'] == "liftreplyban")
@@ -446,7 +446,7 @@ function replyban_run()
 
 		log_moderator_action(array("tid" => $thread['tid'], "fid" => $thread['fid'], "uid" => $user['uid'], "username" => $user['username']), $lang->user_reply_banned_lifted);
 
-		moderation_redirect(get_thread_link($thread['tid']), $lang->redirect_reply_ban_lifted);
+		moderation_redirect("moderation.php?action=replyban&tid={$thread['tid']}", $lang->redirect_reply_ban_lifted);
 	}
 	exit;
 }
