@@ -114,12 +114,13 @@ function replyban_activate()
 {$header}
 <table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
 	<tr>
-		<td class="thead" colspan="3"><strong>{$lang->reply_bans_for}</strong></td>
+		<td class="thead" colspan="4"><strong>{$lang->reply_bans_for}</strong></td>
 	</tr>
 	<tr>
-		<td class="tcat" width="30%"><span class="smalltext"><strong>{$lang->username}</strong></span></td>
-		<td class="tcat" width="40%"><span class="smalltext"><strong>{$lang->reason}</strong></span></td>
+		<td class="tcat" width="25%"><span class="smalltext"><strong>{$lang->username}</strong></span></td>
+		<td class="tcat" width="35%"><span class="smalltext"><strong>{$lang->reason}</strong></span></td>
 		<td class="tcat" width="30%" align="center"><span class="smalltext"><strong>{$lang->expires_on}</strong></span></td>
+		<td class="tcat" width="10%" align="center"><span class="smalltext"><strong>{$lang->options}</strong></span></td>
 	</tr>
 	{$ban_bit}
 </table>
@@ -203,6 +204,7 @@ if(use_xmlhttprequest == "1")
 	<td class="{$alt_bg}">{$ban[\'username\']}</td>
 	<td class="{$alt_bg}">{$ban[\'reason\']}</td>
 	<td class="{$alt_bg}" align="center">{$ban[\'lifted\']}</td>
+	<td class="{$alt_bg}" align="center"><a href="moderation.php?action=liftreplyban&amp;rid={$ban[\'rid\']}&amp;my_post_key={$mybb->post_code}"><strong>{$lang->lift_ban}</strong></a></td>
 </tr>'),
 		'sid'		=> '-1',
 		'version'	=> '',
@@ -213,7 +215,7 @@ if(use_xmlhttprequest == "1")
 	$insert_array = array(
 		'title'		=> 'moderation_replyban_no_bans',
 		'template'	=> $db->escape_string('<tr>
-<td class="trow1" colspan="3" align="center">{$lang->no_bans}</td>
+	<td class="trow1" colspan="4" align="center">{$lang->no_bans}</td>
 </tr>'),
 		'sid'		=> '-1',
 		'version'	=> '',
@@ -259,19 +261,16 @@ function replyban_run()
 	global $db, $mybb, $lang, $templates, $theme, $headerinclude, $header, $footer, $replyban, $moderation;
 	$lang->load("replyban");
 
-	if($mybb->input['action'] != "replyban" && $mybb->input['action'] != "do_replyban")
+	if($mybb->input['action'] != "replyban" && $mybb->input['action'] != "do_replyban" && $mybb->input['action'] != "liftreplyban")
 	{
 		return;
 	}
 
-	$tid = $mybb->get_input('tid', 1);
-	$thread = get_thread($tid);
-
-	$thread['subject'] = htmlspecialchars_uni($thread['subject']);
-	$lang->reply_bans_for = $lang->sprintf($lang->reply_bans_for, $thread['subject']);
-
 	if($mybb->input['action'] == "replyban")
 	{
+		$tid = $mybb->get_input('tid', 1);
+		$thread = get_thread($tid);
+
 		if(!is_moderator($thread['fid'], "canmanagethreads"))
 		{
 			error_no_permission();
@@ -281,6 +280,9 @@ function replyban_run()
 		{
 			error($lang->error_invalidthread);
 		}
+
+		$thread['subject'] = htmlspecialchars_uni($thread['subject']);
+		$lang->reply_bans_for = $lang->sprintf($lang->reply_bans_for, $thread['subject']);
 
 		check_forum_password($thread['fid']);
 
@@ -354,6 +356,9 @@ function replyban_run()
 		// Verify incoming POST request
 		verify_post_check($mybb->get_input('my_post_key'));
 
+		$tid = $mybb->get_input('tid', 1);
+		$thread = get_thread($tid);
+
 		if(!is_moderator($thread['fid'], "canmanagethreads"))
 		{
 			error_no_permission();
@@ -408,6 +413,40 @@ function replyban_run()
 		log_moderator_action(array("tid" => $thread['tid'], "fid" => $thread['fid'], "uid" => $user['uid'], "username" => $user['username']), $lang->user_reply_banned);
 
 		moderation_redirect(get_thread_link($thread['tid']), $lang->redirect_user_banned_replying);
+	}
+
+	if($mybb->input['action'] == "liftreplyban")
+	{
+		// Verify incoming POST request
+		verify_post_check($mybb->get_input('my_post_key'));
+
+		$rid = $mybb->get_input('rid', 1);
+		$query = $db->simple_select("replybans", "*", "rid='{$rid}'");
+		$ban = $db->fetch_array($query);
+
+		if(!$ban['rid'])
+		{
+			error($lang->error_invalidreplyban);
+		}
+
+		$thread = get_thread($ban['tid']);
+		$user = get_user($ban['uid']);
+
+		if(!$thread['tid'])
+		{
+			error($lang->error_invalidthread);
+		}
+
+		if(!is_moderator($thread['fid'], "canmanagethreads"))
+		{
+			error_no_permission();
+		}
+
+		$db->delete_query("replybans", "rid='{$ban['rid']}'");
+
+		log_moderator_action(array("tid" => $thread['tid'], "fid" => $thread['fid'], "uid" => $user['uid'], "username" => $user['username']), $lang->user_reply_banned_lifted);
+
+		moderation_redirect(get_thread_link($thread['tid']), $lang->redirect_reply_ban_lifted);
 	}
 	exit;
 }
