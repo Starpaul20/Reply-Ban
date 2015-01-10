@@ -234,7 +234,7 @@ if(use_xmlhttprequest == "1")
 
 	$insert_array = array(
 		'title'		=> 'showthread_replybanlink',
-		'template'	=> $db->escape_string(' | <a href="moderation.php?action=replyban&tid={$thread[\'tid\']}">{$lang->reply_bans}</a>'),
+		'template'	=> $db->escape_string(' | <a href="moderation.php?action=replyban&amp;tid={$thread[\'tid\']}">{$lang->reply_bans}</a>'),
 		'sid'		=> '-1',
 		'version'	=> '',
 		'dateline'	=> TIME_NOW
