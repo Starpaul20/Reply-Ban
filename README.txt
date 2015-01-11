@@ -1,6 +1,6 @@
 ## INFORMATION ##
 
-Reply Ban (1.0) for MyBB 1.8
+Reply Ban (1.1) for MyBB 1.8
 Created by: Starpaul20
 Copyright: ©2015
 License: GPL
@@ -20,4 +20,4 @@ The reply ban page can be accessed by clicking Reply Bans link located next to T
 
 ## UPDATING ##
 
-Any beta version should be reinstalled.
+If you're updating from any previous version, you must first deactivate the plugin (do not uninstall), upload all new files and reactivate.
