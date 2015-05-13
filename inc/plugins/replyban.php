@@ -303,7 +303,7 @@ function replyban_run()
 
 	if($mybb->input['action'] == "replyban")
 	{
-		$tid = $mybb->get_input('tid', 1);
+		$tid = $mybb->get_input('tid', MyBB::INPUT_INT);
 		$thread = get_thread($tid);
 
 		if(!is_moderator($thread['fid'], "canmanagethreads"))
@@ -391,7 +391,7 @@ function replyban_run()
 		// Verify incoming POST request
 		verify_post_check($mybb->get_input('my_post_key'));
 
-		$tid = $mybb->get_input('tid', 1);
+		$tid = $mybb->get_input('tid', MyBB::INPUT_INT);
 		$thread = get_thread($tid);
 
 		if(!is_moderator($thread['fid'], "canmanagethreads"))
@@ -455,7 +455,7 @@ function replyban_run()
 		// Verify incoming POST request
 		verify_post_check($mybb->get_input('my_post_key'));
 
-		$rid = $mybb->get_input('rid', 1);
+		$rid = $mybb->get_input('rid', MyBB::INPUT_INT);
 		$query = $db->simple_select("replybans", "*", "rid='{$rid}'");
 		$ban = $db->fetch_array($query);
 
