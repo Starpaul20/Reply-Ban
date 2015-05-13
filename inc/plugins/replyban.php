@@ -37,6 +37,8 @@ $plugins->add_hook("showthread_start", "replyban_link");
 $plugins->add_hook("showthread_end", "replyban_quickreply");
 $plugins->add_hook("newreply_start", "replyban_reply");
 $plugins->add_hook("newreply_do_newreply_start", "replyban_reply");
+$plugins->add_hook("class_moderation_delete_thread_start", "replyban_delete_thread");
+$plugins->add_hook("class_moderation_merge_threads", "replyban_merge_thread");
 $plugins->add_hook("task_usercleanup", "replyban_lift");
 $plugins->add_hook("datahandler_user_delete_content", "replyban_delete");
 
@@ -531,6 +533,28 @@ function replyban_reply()
 
 		error($lang->error_banned_from_replying);
 	}
+}
+
+// Delete reply bans if thread is deleted
+function replyban_delete_thread($tid)
+{
+	global $db;
+
+	$db->delete_query("replybans", "tid='{$tid}'");
+
+	return $tid;
+}
+
+// Update tid if threads are merged
+function replyban_merge_thread($arguments)
+{
+	global $db;
+	$sqlarray = array(
+		"tid" => "{$arguments['tid']}",
+	);
+	$db->update_query("replybans", $sqlarray, "tid='{$arguments['mergetid']}'");
+
+	return $arguments;
 }
 
 // Lift old reply bans
