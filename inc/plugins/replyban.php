@@ -64,15 +64,41 @@ function replyban_install()
 	replyban_uninstall();
 	$collation = $db->build_create_table_collation();
 
-	$db->write_query("CREATE TABLE ".TABLE_PREFIX."replybans (
-				rid int(10) unsigned NOT NULL auto_increment,
+	switch($db->type)
+	{
+		case "pgsql":
+			$db->write_query("CREATE TABLE ".TABLE_PREFIX."replybans (
+				rid serial,
+				uid int NOT NULL default '0',
+				tid int NOT NULL default '0',
+				dateline numeric(30,0) NOT NULL default '0',
+				lifted numeric(30,0) NOT NULL default '0',
+				reason varchar(240) NOT NULL default '',
+				PRIMARY KEY (rid)
+			);");
+			break;
+		case "sqlite":
+			$db->write_query("CREATE TABLE ".TABLE_PREFIX."replybans (
+				rid INTEGER PRIMARY KEY,
+				uid int NOT NULL default '0',
+				tid int NOT NULL default '0',
+				dateline int NOT NULL default '0',
+				lifted int NOT NULL default '0',
+				reason varchar(240) NOT NULL default ''
+			);");
+			break;
+		default:
+			$db->write_query("CREATE TABLE ".TABLE_PREFIX."replybans (
+				rid int unsigned NOT NULL auto_increment,
 				uid int unsigned NOT NULL default '0',
 				tid int unsigned NOT NULL default '0',
 				dateline int unsigned NOT NULL default '0',
 				lifted int unsigned NOT NULL default '0',
 				reason varchar(240) NOT NULL default '',
-				PRIMARY KEY(rid)
-			) ENGINE=MyISAM{$collation}");
+				PRIMARY KEY (rid)
+			) ENGINE=MyISAM{$collation};");
+			break;
+	}
 }
 
 // Checks to make sure plugin is installed
