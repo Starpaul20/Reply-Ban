@@ -39,6 +39,11 @@ $plugins->add_hook("newreply_start", "replyban_reply");
 $plugins->add_hook("newreply_do_newreply_start", "replyban_reply");
 $plugins->add_hook("task_usercleanup", "replyban_lift");
 
+$plugins->add_hook("admin_tools_menu_logs", "replyban_admin_menu");
+$plugins->add_hook("admin_tools_action_handler", "replyban_admin_action_handler");
+$plugins->add_hook("admin_tools_permissions", "replyban_admin_permissions");
+$plugins->add_hook("admin_tools_get_admin_log_action", "replyban_admin_adminlog");
+
 // The information that shows up on the plugin manager
 function replyban_info()
 {
@@ -269,6 +274,8 @@ if(use_xmlhttprequest == "1")
 
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
 	find_replace_templatesets("showthread", "#".preg_quote('{$threadnoteslink}')."#i", '{$threadnoteslink}{$replybanlink}');
+
+	change_admin_permission('tools', 'replybans');
 }
 
 // This function runs when the plugin is deactivated.
@@ -279,6 +286,8 @@ function replyban_deactivate()
 
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
 	find_replace_templatesets("showthread", "#".preg_quote('{$replybanlink}')."#i", '', 0);
+
+	change_admin_permission('tools', 'replybans', -1);
 }
 
 // Reply Ban moderation page
@@ -532,6 +541,43 @@ function replyban_lift(&$task)
 	{
 		$db->delete_query("replybans", "rid='{$replyban['rid']}'");
 	}
+}
+
+// Admin CP reply ban page
+function replyban_admin_menu($sub_menu)
+{
+	global $lang;
+	$lang->load("tools_replybans");
+
+	$sub_menu['110'] = array('id' => 'replybans', 'title' => $lang->reply_bans, 'link' => 'index.php?module=tools-replybans');
+
+	return $sub_menu;
+}
+
+function replyban_admin_action_handler($actions)
+{
+	$actions['replybans'] = array('active' => 'replybans', 'file' => 'replybans.php');
+
+	return $actions;
+}
+
+function replyban_admin_permissions($admin_permissions)
+{
+	global $lang;
+	$lang->load("tools_replybans");
+
+	$admin_permissions['replybans'] = $lang->can_manage_reply_bans;
+
+	return $admin_permissions;
+}
+
+// Admin Log display
+function replyban_admin_adminlog($plugin_array)
+{
+	global $lang;
+	$lang->load("tools_replybans");
+
+	return $plugin_array;
 }
 
 ?>
