@@ -38,7 +38,9 @@ $plugins->add_hook("showthread_end", "replyban_quickreply");
 $plugins->add_hook("newreply_start", "replyban_reply");
 $plugins->add_hook("newreply_do_newreply_start", "replyban_reply");
 $plugins->add_hook("task_usercleanup", "replyban_lift");
+$plugins->add_hook("datahandler_user_delete_content", "replyban_delete");
 
+$plugins->add_hook("admin_user_users_merge_commit", "replyban_merge");
 $plugins->add_hook("admin_tools_menu_logs", "replyban_admin_menu");
 $plugins->add_hook("admin_tools_action_handler", "replyban_admin_action_handler");
 $plugins->add_hook("admin_tools_permissions", "replyban_admin_permissions");
@@ -541,6 +543,27 @@ function replyban_lift(&$task)
 	{
 		$db->delete_query("replybans", "rid='{$replyban['rid']}'");
 	}
+}
+
+// Delete reply bans if user is deleted
+function replyban_delete($delete)
+{
+	global $db;
+
+	$db->delete_query('replybans', 'uid IN('.$delete->delete_uids.')');
+
+	return $delete;
+}
+
+// Update reply bans if users are merged
+function replyban_merge()
+{
+	global $db, $source_user, $destination_user;
+
+	$uid = array(
+		"uid" => $destination_user['uid']
+	);
+	$db->update_query("replybans", $uid, "uid='{$source_user['uid']}'");
 }
 
 // Admin CP reply ban page
