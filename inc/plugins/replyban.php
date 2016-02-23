@@ -596,7 +596,7 @@ function replyban_admin_menu($sub_menu)
 	global $lang;
 	$lang->load("tools_replybans");
 
-	$sub_menu['110'] = array('id' => 'replybans', 'title' => $lang->reply_bans, 'link' => 'index.php?module=tools-replybans');
+	$sub_menu['130'] = array('id' => 'replybans', 'title' => $lang->reply_bans, 'link' => 'index.php?module=tools-replybans');
 
 	return $sub_menu;
 }
