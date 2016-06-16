@@ -337,7 +337,8 @@ function replyban_run()
 		");
 		while($ban = $db->fetch_array($query))
 		{
-			$ban['reason'] = htmlspecialchars_uni($ban['reason']); 
+			$ban['reason'] = htmlspecialchars_uni($ban['reason']);
+			$ban['username'] = htmlspecialchars_uni($ban['username']);
 			$ban['username'] = build_profile_link($ban['username'], $ban['uid']);
 
 			if($ban['lifted'] == 0)

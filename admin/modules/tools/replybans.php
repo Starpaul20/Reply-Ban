@@ -179,7 +179,7 @@ if(!$mybb->input['action'])
 			$replyban['lifted'] = my_date('relative', $replyban['lifted']);
 		}
 
-		$username = format_name($replyban['username'], $replyban['usergroup'], $replyban['displaygroup']);
+		$username = format_name(htmlspecialchars_uni($replyban['username']), $replyban['usergroup'], $replyban['displaygroup']);
 		$replyban['profilelink'] = build_profile_link($username, $replyban['uid'], "_blank");
 		$replyban['subject'] = htmlspecialchars_uni($replyban['subject']);
 		$replyban['reason'] = htmlspecialchars_uni($replyban['reason']);
@@ -227,7 +227,7 @@ if(!$mybb->input['action'])
 		{
 			$selected = "selected=\"selected\"";
 		}
-		$user_options[$user['uid']] = $user['username'];
+		$user_options[$user['uid']] = htmlspecialchars_uni($user['username']);
 	}
 
 	$thread_options[''] = $lang->all_threads;
