@@ -35,5 +35,3 @@ $l['redirect_reply_ban_lifted'] = "The reply ban has been lifted from this user.
 
 $l['user_reply_banned'] = "User reply banned";
 $l['user_reply_banned_lifted'] = "User reply ban lifted";
-
-?>
