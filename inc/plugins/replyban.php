@@ -329,7 +329,7 @@ function replyban_run()
 		add_breadcrumb($lang->reply_bans);
 
 		$query = $db->query("
-			SELECT r.*, u.username
+			SELECT r.*, u.username, u.usergroup, u.displaygroup
 			FROM ".TABLE_PREFIX."replybans r
 			LEFT JOIN ".TABLE_PREFIX."users u ON (r.uid=u.uid)
 			WHERE r.tid='{$thread['tid']}'
@@ -338,7 +338,7 @@ function replyban_run()
 		while($ban = $db->fetch_array($query))
 		{
 			$ban['reason'] = htmlspecialchars_uni($ban['reason']);
-			$ban['username'] = htmlspecialchars_uni($ban['username']);
+			$ban['username'] = format_name(htmlspecialchars_uni($ban['username']), $ban['usergroup'], $ban['displaygroup']);
 			$ban['username'] = build_profile_link($ban['username'], $ban['uid']);
 
 			if($ban['lifted'] == 0)
