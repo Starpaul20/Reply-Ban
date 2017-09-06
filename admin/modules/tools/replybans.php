@@ -179,8 +179,16 @@ if(!$mybb->input['action'])
 			$replyban['lifted'] = my_date('relative', $replyban['lifted']);
 		}
 
-		$username = format_name(htmlspecialchars_uni($replyban['username']), $replyban['usergroup'], $replyban['displaygroup']);
-		$replyban['profilelink'] = build_profile_link($username, $replyban['uid'], "_blank");
+		if($replyban['username'])
+		{
+			$username = format_name(htmlspecialchars_uni($replyban['username']), $replyban['usergroup'], $replyban['displaygroup']);
+			$replyban['profilelink'] = build_profile_link($username, $replyban['uid'], "_blank");
+		}
+		else
+		{
+			$username = $replyban['profilelink'] = $replyban['username'] = htmlspecialchars_uni($lang->na_deleted);
+		}
+
 		$replyban['subject'] = htmlspecialchars_uni($replyban['subject']);
 		$replyban['reason'] = htmlspecialchars_uni($replyban['reason']);
 
@@ -222,6 +230,12 @@ if(!$mybb->input['action'])
 	");
 	while($user = $db->fetch_array($query))
 	{
+		// Deleted Users
+		if(!$user['username'])
+		{
+			$user['username'] = htmlspecialchars_uni($lang->na_deleted);
+		}
+
 		$selected = '';
 		if($mybb->input['uid'] == $user['uid'])
 		{
@@ -241,6 +255,12 @@ if(!$mybb->input['action'])
 	");
 	while($thread = $db->fetch_array($query2))
 	{
+		// Deleted Threads
+		if(!$thread['subject'])
+		{
+			$thread['subject'] = htmlspecialchars_uni($lang->na_deleted);
+		}
+
 		$thread_options[$thread['tid']] = $thread['subject'];
 	}
 

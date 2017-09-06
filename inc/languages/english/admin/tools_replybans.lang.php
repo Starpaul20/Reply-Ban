@@ -14,6 +14,7 @@ $l['admin_log_tools_replybans_lift'] = "Lifted reply ban on user #{1} ({2}) for 
 $l['no_replybans'] = "There are no reply ban entries with the selected criteria.";
 
 $l['username'] = "Username";
+$l['na_deleted'] = "N/A - Been Deleted";
 $l['thread'] = "Thread";
 $l['date_banned_on'] = "Date Banned On";
 $l['lifted_on'] = "Lifted On";
