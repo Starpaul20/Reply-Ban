@@ -296,7 +296,7 @@ function replyban_deactivate()
 // Reply Ban moderation page
 function replyban_run()
 {
-	global $db, $mybb, $lang, $templates, $theme, $headerinclude, $header, $footer, $replyban, $moderation;
+	global $db, $mybb, $lang, $templates, $theme, $headerinclude, $header, $footer, $replyban, $moderation, $parser;
 	$lang->load("replyban");
 
 	if($mybb->input['action'] != "replyban" && $mybb->input['action'] != "do_replyban" && $mybb->input['action'] != "liftreplyban")
@@ -319,7 +319,7 @@ function replyban_run()
 			error($lang->error_invalidthread);
 		}
 
-		$thread['subject'] = htmlspecialchars_uni($thread['subject']);
+		$thread['subject'] = htmlspecialchars_uni($parser->parse_badwords($thread['subject']));
 		$lang->reply_bans_for = $lang->sprintf($lang->reply_bans_for, $thread['subject']);
 
 		check_forum_password($thread['fid']);
