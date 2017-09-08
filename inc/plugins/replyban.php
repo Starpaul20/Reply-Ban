@@ -296,7 +296,7 @@ function replyban_deactivate()
 // Reply Ban moderation page
 function replyban_run()
 {
-	global $db, $mybb, $lang, $templates, $theme, $headerinclude, $header, $footer, $replyban, $moderation, $parser;
+	global $db, $mybb, $lang, $templates, $theme, $headerinclude, $header, $footer, $parser;
 	$lang->load("replyban");
 
 	if($mybb->input['action'] != "replyban" && $mybb->input['action'] != "do_replyban" && $mybb->input['action'] != "liftreplyban")
