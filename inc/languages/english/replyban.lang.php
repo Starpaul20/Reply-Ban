@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Reply Ban
  * Copyright 2015 Starpaul20
