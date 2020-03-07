@@ -33,7 +33,8 @@ if(THIS_SCRIPT == 'moderation.php')
 
 // Tell MyBB when to run the hooks
 $plugins->add_hook("moderation_start", "replyban_run");
-$plugins->add_hook("showthread_start", "replyban_link");
+$plugins->add_hook("showthread_start", "replyban_showthread");
+$plugins->add_hook("postbit", "replyban_postbit");
 $plugins->add_hook("showthread_end", "replyban_quickreply");
 $plugins->add_hook("newreply_start", "replyban_reply");
 $plugins->add_hook("newreply_do_newreply_start", "replyban_reply");
@@ -425,9 +426,9 @@ function replyban_run()
 		}
 
 		$query = $db->simple_select('replybans', 'rid', "uid='{$user['uid']}' AND tid='{$thread['tid']}'");
-		$existingban = $db->fetch_field($query, 'rid');
+		$existingreplyban = $db->fetch_field($query, 'rid');
 
-		if($existingban > 0)
+		if($existingreplyban > 0)
 		{
 			error($lang->error_alreadybanned);
 		}
@@ -493,10 +494,10 @@ function replyban_run()
 	exit;
 }
 
-// Link to reply bans on show thread
-function replyban_link()
+// Link to reply bans on show thread/Query to see if user is reply banned (to remove postbit buttons)
+function replyban_showthread()
 {
-	global $lang, $templates, $replybanlink, $fid, $thread;
+	global $db, $mybb, $lang, $templates, $replybanlink, $fid, $thread, $existingreplyban;
 	$lang->load("replyban");
 
 	$replybanlink = '';
@@ -504,17 +505,30 @@ function replyban_link()
 	{
 		eval('$replybanlink = "'.$templates->get('showthread_replybanlink').'";');
 	}
+
+	$query = $db->simple_select('replybans', 'rid', "uid='{$mybb->user['uid']}' AND tid='{$thread['tid']}'");
+	$existingreplyban = $db->fetch_field($query, 'rid');
+}
+
+// Remove postbit buttons if reply banned
+function replyban_postbit($post)
+{
+	global $existingreplyban;
+
+	if($existingreplyban > 0)
+	{
+		$post['button_edit'] = $post['button_quickdelete'] = $post['button_multiquote'] = $post['button_quote'] = '';
+	}
+
+	return $post;
 }
 
 // Remove quick reply box if reply banned
 function replyban_quickreply()
 {
-	global $db, $mybb, $thread, $quickreply, $newreply;
+	global $quickreply, $newreply, $existingreplyban;
 
-	$query = $db->simple_select('replybans', 'rid', "uid='{$mybb->user['uid']}' AND tid='{$thread['tid']}'");
-	$existingban = $db->fetch_field($query, 'rid');
-
-	if($existingban > 0)
+	if($existingreplyban > 0)
 	{
 		$quickreply = $newreply = '';
 	}
@@ -527,12 +541,12 @@ function replyban_reply()
 	$lang->load("replyban");
 
 	$query = $db->simple_select('replybans', 'rid, reason', "uid='{$mybb->user['uid']}' AND tid='{$thread['tid']}'");
-	$existingban = $db->fetch_array($query);
+	$existingreplyban = $db->fetch_array($query);
 
-	if($existingban['rid'] > 0)
+	if($existingreplyban['rid'] > 0)
 	{
-		$existingban['reason'] = htmlspecialchars_uni($existingban['reason']);
-		$lang->error_banned_from_replying_reason = $lang->sprintf($lang->error_banned_from_replying_reason, $existingban['reason']);
+		$existingreplyban['reason'] = htmlspecialchars_uni($existingreplyban['reason']);
+		$lang->error_banned_from_replying_reason = $lang->sprintf($lang->error_banned_from_replying_reason, $existingreplyban['reason']);
 
 		error($lang->error_banned_from_replying_reason);
 	}
@@ -545,9 +559,9 @@ function replyban_xmlhttp()
 	$lang->load("replyban");
 
 	$query = $db->simple_select('replybans', 'rid', "uid='{$mybb->user['uid']}' AND tid='{$post['tid']}'");
-	$existingban = $db->fetch_field($query, 'rid');
+	$existingreplyban = $db->fetch_field($query, 'rid');
 
-	if($existingban['rid'] > 0)
+	if($existingreplyban['rid'] > 0)
 	{
 		xmlhttp_error($lang->error_banned_from_replying);
 	}
