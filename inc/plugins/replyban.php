@@ -37,6 +37,9 @@ $plugins->add_hook("showthread_start", "replyban_link");
 $plugins->add_hook("showthread_end", "replyban_quickreply");
 $plugins->add_hook("newreply_start", "replyban_reply");
 $plugins->add_hook("newreply_do_newreply_start", "replyban_reply");
+$plugins->add_hook("editpost_action_start", "replyban_reply");
+$plugins->add_hook("editpost_do_editpost_start", "replyban_reply");
+$plugins->add_hook("xmlhttp_edit_post_end", "replyban_xmlhttp");
 $plugins->add_hook("class_moderation_delete_thread_start", "replyban_delete_thread");
 $plugins->add_hook("class_moderation_merge_threads", "replyban_merge_thread");
 $plugins->add_hook("task_usercleanup", "replyban_lift");
@@ -529,9 +532,24 @@ function replyban_reply()
 	if($existingban['rid'] > 0)
 	{
 		$existingban['reason'] = htmlspecialchars_uni($existingban['reason']);
-		$lang->error_banned_from_replying = $lang->sprintf($lang->error_banned_from_replying, $existingban['reason']);
+		$lang->error_banned_from_replying_reason = $lang->sprintf($lang->error_banned_from_replying_reason, $existingban['reason']);
 
-		error($lang->error_banned_from_replying);
+		error($lang->error_banned_from_replying_reason);
+	}
+}
+
+// Error if quick editing is used
+function replyban_xmlhttp()
+{
+	global $db, $mybb, $lang, $post;
+	$lang->load("replyban");
+
+	$query = $db->simple_select('replybans', 'rid', "uid='{$mybb->user['uid']}' AND tid='{$post['tid']}'");
+	$existingban = $db->fetch_field($query, 'rid');
+
+	if($existingban['rid'] > 0)
+	{
+		xmlhttp_error($lang->error_banned_from_replying);
 	}
 }
 

@@ -28,7 +28,8 @@ $l['error_invaliduser'] = "The specified user does not exist.";
 $l['error_invalidreplyban'] = "The specified reply ban does not exist.";
 $l['error_missing_reason'] = "You did not specify a reason for this ban.";
 $l['error_alreadybanned'] = "The user has already been banned from replying.";
-$l['error_banned_from_replying'] = "You have been banned from replying to this thread.<br /><br />Reason: {1}";
+$l['error_banned_from_replying_reason'] = "You have been banned from replying to this thread.<br /><br />Reason: {1}";
+$l['error_banned_from_replying'] = "You have been banned from replying to this thread.";
 
 $l['redirect_user_banned_replying'] = "The user has been banned from replying to the thread.<br />You will now be redirected to the thread.";
 $l['redirect_reply_ban_lifted'] = "The reply ban has been lifted from this user.<br />You will now be redirected to the thread.";
