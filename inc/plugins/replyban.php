@@ -18,7 +18,7 @@ if(THIS_SCRIPT == 'showthread.php')
 	{
 		$templatelist .= ',';
 	}
-	$templatelist .= 'showthread_replybanlink';
+	$templatelist .= 'showthread_replybanlink,showthread_replybannotice';
 }
 
 if(THIS_SCRIPT == 'moderation.php')
@@ -279,8 +279,18 @@ if(use_xmlhttprequest == "1")
 	);
 	$db->insert_query("templates", $insert_array);
 
+	$insert_array = array(
+		'title'		=> 'showthread_replybannotice',
+		'template'	=> $db->escape_string('<div class="red_alert"><strong>{$lang->error_banned_from_replying}</strong> {$lang->reason}: {$replybanreason}<br />{$lang->ban_will_be_lifted}: {$replybanlift}</div>'),
+		'sid'		=> '-1',
+		'version'	=> '',
+		'dateline'	=> TIME_NOW
+	);
+	$db->insert_query("templates", $insert_array);
+
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
 	find_replace_templatesets("showthread", "#".preg_quote('{$threadnoteslink}')."#i", '{$threadnoteslink}{$replybanlink}');
+	find_replace_templatesets("showthread", "#".preg_quote('{$header}')."#i", '{$header}{$replybannotice}');
 
 	change_admin_permission('tools', 'replybans');
 }
@@ -289,10 +299,11 @@ if(use_xmlhttprequest == "1")
 function replyban_deactivate()
 {
 	global $db;
-	$db->delete_query("templates", "title IN('moderation_replyban','moderation_replyban_bit','moderation_replyban_no_bans','moderation_replyban_liftlist','showthread_replybanlink')");
+	$db->delete_query("templates", "title IN('moderation_replyban','moderation_replyban_bit','moderation_replyban_no_bans','moderation_replyban_liftlist','showthread_replybanlink','showthread_replybannotice')");
 
 	include MYBB_ROOT."/inc/adminfunctions_templates.php";
 	find_replace_templatesets("showthread", "#".preg_quote('{$replybanlink}')."#i", '', 0);
+	find_replace_templatesets("showthread", "#".preg_quote('{$replybannotice}')."#i", '', 0);
 
 	change_admin_permission('tools', 'replybans', -1);
 }
@@ -494,10 +505,10 @@ function replyban_run()
 	exit;
 }
 
-// Link to reply bans on show thread/Query to see if user is reply banned (to remove postbit buttons)
+// Link to reply bans on show thread/Query to see if user is reply banned (to remove postbit buttons)/Show ban notice in thread
 function replyban_showthread()
 {
-	global $db, $mybb, $lang, $templates, $replybanlink, $fid, $thread, $existingreplyban;
+	global $db, $mybb, $lang, $templates, $replybanlink, $fid, $thread, $existingreplyban, $replybannotice;
 	$lang->load("replyban");
 
 	$replybanlink = '';
@@ -506,8 +517,32 @@ function replyban_showthread()
 		eval('$replybanlink = "'.$templates->get('showthread_replybanlink').'";');
 	}
 
-	$query = $db->simple_select('replybans', 'rid', "uid='{$mybb->user['uid']}' AND tid='{$thread['tid']}'");
-	$existingreplyban = $db->fetch_field($query, 'rid');
+	$query = $db->simple_select('replybans', 'rid, reason, lifted', "uid='{$mybb->user['uid']}' AND tid='{$thread['tid']}'");
+	$existingreplyban = $db->fetch_array($query);
+
+	$replybannotice = '';
+	if($existingreplyban['rid'] > 0)
+	{
+		$replybanlift = $lang->banned_lifted_never;
+		$replybanreason = htmlspecialchars_uni($existingreplyban['reason']);
+
+		if($existingreplyban['lifted'] > 0)
+		{
+			$replybanlift = my_date('normal', $existingreplyban['lifted']);
+		}
+
+		if(empty($replybanreason))
+		{
+			$replybanreason = $lang->unknown;
+		}
+
+		if(empty($replybanlift))
+		{
+			$replybanlift = $lang->unknown;
+		}
+
+		eval('$replybannotice = "'.$templates->get('showthread_replybannotice').'";');
+	}
 }
 
 // Remove postbit buttons if reply banned
@@ -515,7 +550,7 @@ function replyban_postbit($post)
 {
 	global $existingreplyban;
 
-	if($existingreplyban > 0)
+	if($existingreplyban['rid'] > 0)
 	{
 		$post['button_edit'] = $post['button_quickdelete'] = $post['button_multiquote'] = $post['button_quote'] = '';
 	}
@@ -528,7 +563,7 @@ function replyban_quickreply()
 {
 	global $quickreply, $newreply, $existingreplyban;
 
-	if($existingreplyban > 0)
+	if($existingreplyban['rid'] > 0)
 	{
 		$quickreply = $newreply = '';
 	}

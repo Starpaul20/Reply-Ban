@@ -22,6 +22,7 @@ $l['no_bans'] = "There are no reply bans at this time.";
 $l['ban_user'] = "Ban User";
 $l['search_user'] = "Search for a user";
 $l['permanent'] = "Permanent";
+$l['ban_will_be_lifted'] = "Ban will be lifted";
 
 $l['error_invalidthread'] = "The specified thread does not exist.";
 $l['error_invaliduser'] = "The specified user does not exist.";
