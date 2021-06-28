@@ -11,24 +11,27 @@ if(!defined("IN_MYBB"))
 }
 
 // Neat trick for caching our custom template(s)
-if(THIS_SCRIPT == 'showthread.php')
+if(defined('THIS_SCRIPT'))
 {
-	global $templatelist;
-	if(isset($templatelist))
+	if(THIS_SCRIPT == 'showthread.php')
 	{
-		$templatelist .= ',';
+		global $templatelist;
+		if(isset($templatelist))
+		{
+			$templatelist .= ',';
+		}
+		$templatelist .= 'showthread_replybanlink,showthread_replybannotice';
 	}
-	$templatelist .= 'showthread_replybanlink,showthread_replybannotice';
-}
 
-if(THIS_SCRIPT == 'moderation.php')
-{
-	global $templatelist;
-	if(isset($templatelist))
+	if(THIS_SCRIPT == 'moderation.php')
 	{
-		$templatelist .= ',';
+		global $templatelist;
+		if(isset($templatelist))
+		{
+			$templatelist .= ',';
+		}
+		$templatelist .= 'moderation_replyban,moderation_replyban_no_bans,moderation_replyban_liftlist,moderation_replyban_bit';
 	}
-	$templatelist .= 'moderation_replyban,moderation_replyban_no_bans,moderation_replyban_liftlist,moderation_replyban_bit';
 }
 
 // Tell MyBB when to run the hooks
