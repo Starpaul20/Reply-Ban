@@ -177,11 +177,11 @@ function replyban_activate()
 		</tr>
 		<tr>
 			<td class="trow1" width="25%"><strong>{$lang->username}:</strong></td>
-			<td class="trow1" width="75%"><input type="text" class="textbox" name="username" id="username" value="{$username}" size="25" /></td>
+			<td class="trow1" width="75%"><input type="text" class="textbox" name="username" id="username" size="25" /></td>
 		</tr>
 		<tr>
 			<td class="trow2" width="25%"><strong>{$lang->ban_reason}:</strong></td>
-			<td class="trow2" width="75%"><textarea name="reason" cols="60" rows="4" maxlength="200">{$banreason}</textarea></td>
+			<td class="trow2" width="75%"><textarea name="reason" cols="60" rows="4" maxlength="200"></textarea></td>
 		</tr>
 		<tr>
 			<td class="trow1" width="25%"><strong>{$lang->ban_lift_on}:</strong></td>
@@ -346,6 +346,7 @@ function replyban_run()
 		add_breadcrumb($thread['subject'], get_thread_link($thread['tid']));
 		add_breadcrumb($lang->reply_bans);
 
+		$ban_bit = '';
 		$query = $db->query("
 			SELECT r.*, u.username, u.usergroup, u.displaygroup
 			FROM ".TABLE_PREFIX."replybans r
@@ -428,7 +429,7 @@ function replyban_run()
 
 		$user = get_user_by_username($mybb->input['username'], array('fields' => array('username')));
 
-		if(!$user['uid'])
+		if(empty($user['uid']))
 		{
 			error($lang->error_invaliduser);
 		}
@@ -524,7 +525,7 @@ function replyban_showthread()
 	$existingreplyban = $db->fetch_array($query);
 
 	$replybannotice = '';
-	if($existingreplyban['rid'] > 0)
+	if(!empty($existingreplyban) && $existingreplyban['rid'] > 0)
 	{
 		$replybanlift = $lang->banned_lifted_never;
 		$replybanreason = htmlspecialchars_uni($existingreplyban['reason']);
@@ -553,7 +554,7 @@ function replyban_postbit($post)
 {
 	global $existingreplyban;
 
-	if($existingreplyban['rid'] > 0)
+	if(!empty($existingreplyban) && $existingreplyban['rid'] > 0)
 	{
 		$post['button_edit'] = $post['button_quickdelete'] = $post['button_multiquote'] = $post['button_quote'] = '';
 	}
@@ -566,7 +567,7 @@ function replyban_quickreply()
 {
 	global $quickreply, $newreply, $existingreplyban;
 
-	if($existingreplyban['rid'] > 0)
+	if(!empty($existingreplyban) && $existingreplyban['rid'] > 0)
 	{
 		$quickreply = $newreply = '';
 	}
