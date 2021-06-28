@@ -291,7 +291,7 @@ if(use_xmlhttprequest == "1")
 	);
 	$db->insert_query("templates", $insert_array);
 
-	include MYBB_ROOT."/inc/adminfunctions_templates.php";
+	require_once MYBB_ROOT."/inc/adminfunctions_templates.php";
 	find_replace_templatesets("showthread", "#".preg_quote('{$threadnoteslink}')."#i", '{$threadnoteslink}{$replybanlink}');
 	find_replace_templatesets("showthread", "#".preg_quote('{$header}')."#i", '{$header}{$replybannotice}');
 
@@ -304,7 +304,7 @@ function replyban_deactivate()
 	global $db;
 	$db->delete_query("templates", "title IN('moderation_replyban','moderation_replyban_bit','moderation_replyban_no_bans','moderation_replyban_liftlist','showthread_replybanlink','showthread_replybannotice')");
 
-	include MYBB_ROOT."/inc/adminfunctions_templates.php";
+	require_once MYBB_ROOT."/inc/adminfunctions_templates.php";
 	find_replace_templatesets("showthread", "#".preg_quote('{$replybanlink}')."#i", '', 0);
 	find_replace_templatesets("showthread", "#".preg_quote('{$replybannotice}')."#i", '', 0);
 
