@@ -1,3 +1,6 @@
+1.6 (May 20th, 2024)
+- Fixed undefined error in Admin CP with PHP 8.2
+
 1.5 (June 28th, 2021)
 - Added check to see if THIS_SCRIPT is defined
 - Fixed PHP 8.0 errors
