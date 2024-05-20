@@ -37,7 +37,7 @@ if($mybb->input['action'] == "lift")
 	}
 
 	// User clicked no
-	if($mybb->input['no'])
+	if($mybb->get_input('no'))
 	{
 		admin_redirect("index.php?module=tools-replybans");
 	}
